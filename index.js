@@ -82,6 +82,29 @@ async function run() {
     res.send(result)
   })
 
+  // get admin
+  app.get('/users/admin/:email', async (req, res) => {
+    const email = req.params.email
+
+    const query = { email: email }
+    const user = await userCollection.findOne(query)
+    const result = { admin: user?.role === 'Admin'}
+    res.send(result)
+  })
+
+  app.patch('/users/admin/:id', async (req, res) => {
+    const id = req.params.id;
+    const role = req.body
+    const filter = {_id: new ObjectId(id)}
+    const updateDoc = {
+      $set: {
+        role: role
+      }
+    }
+    const result = await usersCollection.updateOne(filter,updateDoc)
+    res.send(result)
+  })
+
 
 
   // post class
@@ -91,7 +114,7 @@ async function run() {
     res.send(result)
   })
 
-  app.get('/classes',verifyJWT, async (req, res) => {
+  app.get('/classes', async (req, res) => {
     result = await classCollection.find().toArray();
     res.send(result)
   })

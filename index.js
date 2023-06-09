@@ -63,7 +63,15 @@ async function run() {
     res.send(result)
   })
 
+  // get all users
+  app.get('/users', async (req, res) =>{
+    const result = await userCollection.find().toArray()
+    res.send(result)
+  })
 
+
+
+  // post class
   app.post('/classes',  async (req, res) => {
     const newItem = req.body
     const result = await classCollection.insertOne(newItem)

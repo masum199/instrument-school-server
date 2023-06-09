@@ -13,32 +13,21 @@ app.use(cors());
 app.use(morgan('dev'));
 
 // jwt
-// const verifyJWT = (req, res, next) => {
-//   const authorization = req.headers.authorization;
-//   if (!authorization) {
-//     return res.status(401).send({ error: true, message: 'unauthorized access' })
-//   }
-//   const token = authorization.split(' ')[1]
-//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-//     if (err) {
-//       return res.status(401).send({ error: true, message: 'unauthorized access' })
-//     }
-//     req.decoded = decoded
-//     next()
-//   })
+const verifyJWT = (req, res, next) => {
+  const authorization = req.headers.authorization;
+  if (!authorization) {
+    return res.status(401).send({ error: true, message: 'unauthorized access' })
+  }
+  const token = authorization.split(' ')[1]
+  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+    if (err) {
+      return res.status(401).send({ error: true, message: 'unauthorized access' })
+    }
+    req.decoded = decoded
+    next()
+  })
 
-// }
-
-// app.post('/jwt', async (req, res) => {
-//   const email = req.body
-
-//   const token = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET, {
-//     expiresIn: '7d'
-//   })
-
-
-//   res.send({ token })
-// })
+}
 
 
 // mongodb
@@ -61,6 +50,25 @@ async function run() {
     const userCollection = client.db('summerDB').collection('users');
     const classCollection = client.db('summerDB').collection('classes')
 
+    // jwt
+    // app.post('/jwt', async (req, res) => {
+    //   const email = req.body
+    //   const token = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET, {
+    //     expiresIn: '7d'
+    //   })
+    //   res.send({ token })
+    // })
+
+    // verify admin
+    // const verifyAdmin = async(req, res, next) => {
+    //   const email = req.decoded.email
+    //   const query = {email: email}
+    //   const user = await usersCollection.findOne(query)
+    //   if(user?.role !== 'admin'){
+    //     return res.status(403).send({error: true, message: 'forbidden Access'})
+    //   }
+    //   next()
+    // }
 
     // save user email and role
     app.put('/users/:email', async (req, res) => {
@@ -83,27 +91,27 @@ async function run() {
     })
 
     // get admin
-    app.get('/users/admin/:email', async (req, res) => {
+    app.get('/users/admin/:email',  async (req, res) => {
       const email = req.params.email
       const query = { email: email }
       const user = await userCollection.findOne(query)
       const result = { admin: user?.role === 'Admin' }
       res.send(result)
     })
-    // get admin
+    // get instructor
     app.get('/users/instructor/:email', async (req, res) => {
       const email = req.params.email
       const query = { email: email }
       const user = await userCollection.findOne(query)
-      const result = { admin: user?.role === 'Instructor' }
+      const result = { instructor: user?.role === 'Instructor' }
       res.send(result)
     })
-    // get admin
+    // get student
     app.get('/users/Student/:email', async (req, res) => {
       const email = req.params.email
       const query = { email: email }
       const user = await userCollection.findOne(query)
-      const result = { admin: user?.role === 'Student' }
+      const result = { student: user?.role === 'Student' }
       res.send(result)
     })
 

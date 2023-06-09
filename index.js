@@ -90,7 +90,24 @@ async function run() {
       const result = { admin: user?.role === 'Admin' }
       res.send(result)
     })
+    // get admin
+    app.get('/users/instructor/:email', async (req, res) => {
+      const email = req.params.email
+      const query = { email: email }
+      const user = await userCollection.findOne(query)
+      const result = { admin: user?.role === 'Instructor' }
+      res.send(result)
+    })
+    // get admin
+    app.get('/users/Student/:email', async (req, res) => {
+      const email = req.params.email
+      const query = { email: email }
+      const user = await userCollection.findOne(query)
+      const result = { admin: user?.role === 'Student' }
+      res.send(result)
+    })
 
+    // make admin
     app.patch('/users/admin/:id', async (req, res) => {
       const id = req.params.id;
       const query = { _id: new ObjectId(id)}
@@ -102,6 +119,8 @@ async function run() {
       const result = await userCollection.updateOne(query, updateDoc)
       res.send(result)
     })
+
+    // make instructor
     app.patch('/users/instructor/:id', async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) }
@@ -113,6 +132,8 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc)
       res.send(result)
     })
+
+    // make student
     app.patch('/users/student/:id', async (req, res) => {
       const id = req.params.id;
       const filter = { _id: new ObjectId(id) }

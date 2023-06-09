@@ -26,16 +26,17 @@ const verifyJWT = (req, res, next) => {
     req.decoded = decoded
     next()
   })
+  
 }
 
 app.post('/jwt', async(req, res) => {
   const email = req.body
-  console.log(email)
+ 
   const token = jwt.sign(email, process.env.ACCESS_TOKEN_SECRET, { 
-    expiresIn: '1h'
+    expiresIn: '7d'
   })
 
-  console.log(token)
+ 
   res.send({token})
 })
 
@@ -90,7 +91,7 @@ async function run() {
     res.send(result)
   })
 
-  app.get('/classes', async (req, res) => {
+  app.get('/classes',verifyJWT, async (req, res) => {
     result = await classCollection.find().toArray();
     res.send(result)
   })

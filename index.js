@@ -106,7 +106,7 @@ async function run() {
       const result = { instructor: user?.role === 'Instructor' }
       res.send(result)
     })
-    // get student
+    // get studentt
     app.get('/users/Student/:email', async (req, res) => {
       const email = req.params.email
       const query = { email: email }

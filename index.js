@@ -162,6 +162,28 @@ async function run() {
     // })
 
 
+    // pending classes
+    app.get('/classes/filter/:status', async (req, res) => {
+      const status = req.params.status;
+      const query = { status: status };
+      const classes = await classCollection.find(query).toArray(); 
+      const pendingClasses = classes.filter((classes) => classes.status === 'pending');
+      
+      res.send(pendingClasses);
+    });
+
+    // approve class
+    app.patch('/classes/approve/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: {
+          status: "approved"
+        }
+      }
+      const result = await classCollection.updateOne(filter, updateDoc)
+      res.send(result)
+    })
 
     // post class
     app.post('/classes', async (req, res) => {
@@ -170,6 +192,7 @@ async function run() {
       res.send(result)
     })
 
+    // get all classes
     app.get('/classes', async (req, res) => {
       result = await classCollection.find().toArray();
       res.send(result)

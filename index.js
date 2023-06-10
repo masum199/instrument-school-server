@@ -204,22 +204,27 @@ async function run() {
       res.send(result)
     })
 
-    // update feedback
+    // sending feedback
     app.put('/classes/feedback/:id', async (req, res) => {
-      const id = req.params.id;
-      const feedback = req.body
-      console.log(id,feedback)
-      const filter = {_id: new ObjectId (id)}
-      const options = {upsert: true}
-      const updatedUser = {
-        $set: {
-         feedback: feedback.feedback
-        }
+      try {
+        const id = req.params.id;
+        const feedback = req.body.feedback;
+        console.log(id, feedback);
+    
+        const filter = { _id: new ObjectId(id) };
+        const update = {
+          $set: {
+            feedback: feedback,
+          },
+        };
+    
+        const result = await classCollection.updateOne(filter, update);
+        res.send(result);
+      } catch (error) {
+        console.log(error);
+        res.status(500).send('Error updating class feedback.');
       }
-
-      const result = await classCollection.updateOne(filter,updatedUser,options)
-      res.send(result);
-    })
+    });
 
     // get all classes
     app.get('/classes', async (req, res) => {

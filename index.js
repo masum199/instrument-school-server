@@ -184,12 +184,41 @@ async function run() {
       const result = await classCollection.updateOne(filter, updateDoc)
       res.send(result)
     })
+    // deny class
+    app.patch('/classes/deny/:id', async (req, res) => {
+      const id = req.params.id;
+      const filter = { _id: new ObjectId(id) }
+      const updateDoc = {
+        $set: {
+          status: "denied"
+        }
+      }
+      const result = await classCollection.updateOne(filter, updateDoc)
+      res.send(result)
+    })
 
     // post class
     app.post('/classes', async (req, res) => {
       const newItem = req.body
       const result = await classCollection.insertOne(newItem)
       res.send(result)
+    })
+
+    // update feedback
+    app.put('/classes/feedback/:id', async (req, res) => {
+      const id = req.params.id;
+      const feedback = req.body
+      console.log(id,feedback)
+      const filter = {_id: new ObjectId (id)}
+      const options = {upsert: true}
+      const updatedUser = {
+        $set: {
+         feedback: feedback.feedback
+        }
+      }
+
+      const result = await classCollection.updateOne(filter,updatedUser,options)
+      res.send(result);
     })
 
     // get all classes

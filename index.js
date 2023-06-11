@@ -106,7 +106,7 @@ async function run() {
       const result = { instructor: user?.role === 'Instructor' }
       res.send(result)
     })
-    // get studentt
+    // get student
     app.get('/users/Student/:email', async (req, res) => {
       const email = req.params.email
       const query = { email: email }
@@ -153,24 +153,7 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc)
       res.send(result)
     })
-
-    // app.get('/users/:id', async (req, res) => {
-    //   const id = req.params.id
-    //   const query = { _id: new ObjectId(id) }
-    //   const result = await userCollection.findOne(query)
-    //   res.send(result)
-    // })
-
-
-    // pending classes
-    app.get('/classes/filter/:status', async (req, res) => {
-      const status = req.params.status;
-      const query = { status: status };
-      const classes = await classCollection.find(query).toArray(); 
-      const pendingClasses = classes.filter((classes) => classes.status === 'pending');
-      
-      res.send(pendingClasses);
-    });
+   
 
     // approve class
     app.patch('/classes/approve/:id', async (req, res) => {
@@ -231,6 +214,11 @@ async function run() {
       result = await classCollection.find().toArray();
       res.send(result)
     })
+    // descending  classes
+    app.get('/classes/descending', async (req, res) => {
+        const result = await classCollection.find().sort({ enrolled: -1 }).limit(6).toArray();
+        res.send(result);
+    });
 
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });

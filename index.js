@@ -49,6 +49,7 @@ async function run() {
 
     const userCollection = client.db('summerDB').collection('users');
     const classCollection = client.db('summerDB').collection('classes')
+    const bookingsCollection = client.db('summerDB').collection('bookings')
 
     // jwt
     // app.post('/jwt', async (req, res) => {
@@ -91,7 +92,7 @@ async function run() {
     })
 
     // get admin
-    app.get('/users/admin/:email',  async (req, res) => {
+    app.get('/users/admin/:email', async (req, res) => {
       const email = req.params.email
       const query = { email: email }
       const user = await userCollection.findOne(query)
@@ -118,7 +119,7 @@ async function run() {
     // make admin
     app.patch('/users/admin/:id', async (req, res) => {
       const id = req.params.id;
-      const query = { _id: new ObjectId(id)}
+      const query = { _id: new ObjectId(id) }
       const updateDoc = {
         $set: {
           role: "Admin"
@@ -153,7 +154,7 @@ async function run() {
       const result = await userCollection.updateOne(filter, updateDoc)
       res.send(result)
     })
-   
+
 
     // approve class
     app.patch('/classes/approve/:id', async (req, res) => {
@@ -187,20 +188,62 @@ async function run() {
       res.send(result)
     })
 
+    // post booking
+    app.patch('/bookings', async (req, res) => {
+      const { 
+        id,
+        classImage,
+        instructorEmail,
+         user,
+         instructorName,
+         name,
+         price,
+         } = req.body;
+         
+         const options = { upsert: true }
+      const bookingData = {
+        classImage,
+        user,
+        instructorEmail,
+        instructorName,
+        name,
+        price,
+        id
+      };
+
+      const result = await bookingsCollection.insertOne(bookingData,options);
+
+      res.send(result)
+    });
+
+    // getBookings
+    app.get('/bookings', async(req,res) => {
+      const result = await bookingsCollection.find().toArray()
+      res.send(result)
+    })
+    // delete  bookings
+    app.delete('/bookings/delete/:id', async (req, res) => {
+      const id = req.params.id;
+      const query = { _id: new ObjectId(id) }
+      const result = await bookingsCollection.deleteOne(query);
+      res.send(result)
+    })
+
+
     // sending feedback
     app.put('/classes/feedback/:id', async (req, res) => {
       try {
         const id = req.params.id;
         const feedback = req.body.feedback;
         console.log(id, feedback);
-    
+
         const filter = { _id: new ObjectId(id) };
         const update = {
           $set: {
             feedback: feedback,
           },
         };
-    
+
         const result = await classCollection.updateOne(filter, update);
         res.send(result);
       } catch (error) {
@@ -216,8 +259,8 @@ async function run() {
     })
     // descending  classes
     app.get('/classes/descending', async (req, res) => {
-        const result = await classCollection.find().sort({ enrolled: -1 }).limit(6).toArray();
-        res.send(result);
+      const result = await classCollection.find().sort({ enrolled: -1 }).limit(6).toArray();
+      res.send(result);
     });
 
     // Send a ping to confirm a successful connection

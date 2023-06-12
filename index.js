@@ -2,6 +2,7 @@ const express = require('express');
 const cors = require('cors');
 const app = express();
 const morgan = require('morgan');
+// const stripe = require('stripe')(process.env.PAYMENT_SECRET_KEY)
 const port = process.env.PORT || 5000;
 const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -13,22 +14,32 @@ app.use(cors());
 app.use(morgan('dev'));
 
 // jwt
-const verifyJWT = (req, res, next) => {
-  const authorization = req.headers.authorization;
-  if (!authorization) {
-    return res.status(401).send({ error: true, message: 'unauthorized access' })
-  }
-  const token = authorization.split(' ')[1]
-  jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
-    if (err) {
-      return res.status(401).send({ error: true, message: 'unauthorized access' })
-    }
-    req.decoded = decoded
-    next()
-  })
+// const verifyJWT = (req, res, next) => {
+//   const authorization = req.headers.authorization;
+//   if (!authorization) {
+//     return res.status(401).send({ error: true, message: 'unauthorized access' })
+//   }
+//   const token = authorization.split(' ')[1]
+//   jwt.verify(token, process.env.ACCESS_TOKEN_SECRET, (err, decoded) => {
+//     if (err) {
+//       return res.status(401).send({ error: true, message: 'unauthorized access' })
+//     }
+//     req.decoded = decoded
+//     next()
+//   })
 
-}
+// }
 
+
+// const verifyAdmin = async(req, res, next) => {
+//   const email = req.decoded.email
+//   const query = {email: email}
+//   const user = await userCollection.findOne(query)
+//   if(user?.role !== 'Admin'){
+//     return res.status(403).send({error: true, message: 'forbidden Access'})
+//   }
+//   next()
+// }
 
 // mongodb
 const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.uya6aoa.mongodb.net/?retryWrites=true&w=majority`;
@@ -229,6 +240,21 @@ async function run() {
       res.send(result)
     })
 
+
+   // create payment intent
+  //  app.post('/create-payment-intent',  async (req, res) => {
+  //   const  price  = req.body;
+  //   if(price){
+  //     const amount = parseInt(price) * 100;
+  //     const paymentIntent = await stripe.paymentIntents.create({
+  //       amount: amount,
+  //       currency: 'usd',
+  //       payment_method_types: ['card']
+  //     });
+  //     res.send({clientSecret: paymentIntent.client_secret });
+  //   }
+    
+  // });
 
     // sending feedback
     app.put('/classes/feedback/:id', async (req, res) => {

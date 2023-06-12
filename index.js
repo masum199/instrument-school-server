@@ -278,7 +278,7 @@ async function run() {
       }
     });
 
-    // get all classes
+    // get all classes for client
     app.get('/classes', async (req, res) => {
       result = await classCollection.find().toArray();
       res.send(result)
